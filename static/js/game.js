@@ -63,6 +63,19 @@ class Game {
         
         // Setup restart dialog
         this.setupRestartDialog();
+
+        // Add flame animation properties
+        this.flameSize = 0;
+        this.flameTime = 0;
+
+        // Add victory animation properties
+        this.victoryAnimation = {
+            active: false,
+            speed: 0,
+            maxSpeed: 15,
+            acceleration: 0.5,
+            trail: []
+        };
     }
     
     async loadAliens() {
@@ -124,17 +137,17 @@ class Game {
     }
     
     update() {
-        if (this.gameOver || this.victory) {
-            // Show restart button
+        if (this.gameOver) {
             this.restartButton.style.display = 'block';
-            
-            // Update fireworks if victory
-            if (this.victory) {
-                this.updateFireworks();
-            }
             return;
         }
-        
+
+        if (this.victory) {
+            this.updateVictoryAnimation();
+            this.updateFireworks();
+            return;
+        }
+
         this.updateStars();
         this.updateExplosions();
         
@@ -225,27 +238,35 @@ class Game {
     drawPlayer() {
         // Make ship flash when invulnerable
         if (this.invulnerableTime > 0 && Math.floor(this.invulnerableTime / 4) % 2 === 0) {
-            return; // Skip drawing to create flashing effect
+            return;
         }
 
         // Determine tilt based on movement
         let tilt = 0;
         if (this.keys['ArrowLeft']) {
-            tilt = -10; // Tilt left
+            tilt = -10;
         } else if (this.keys['ArrowRight']) {
-            tilt = 10; // Tilt right
+            tilt = 10;
         }
 
-        // Save the current context state
         this.ctx.save();
-
-        // Translate and rotate the context for tilting effect
         this.ctx.translate(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
         this.ctx.rotate(tilt * Math.PI / 180);
         this.ctx.translate(-this.player.x - this.player.width / 2, -this.player.y - this.player.height / 2);
 
-        // Draw the ship body
-        this.ctx.fillStyle = '#C0C0C0'; // Silver color
+        // Draw engine flames (behind ship)
+        this.drawEngineFlames();
+
+        // Main body - metallic silver with gradient
+        const bodyGradient = this.ctx.createLinearGradient(
+            this.player.x, this.player.y, 
+            this.player.x + this.player.width, this.player.y + this.player.height
+        );
+        bodyGradient.addColorStop(0, '#A0A0A0');
+        bodyGradient.addColorStop(0.5, '#E0E0E0');
+        bodyGradient.addColorStop(1, '#A0A0A0');
+        
+        this.ctx.fillStyle = bodyGradient;
         this.ctx.beginPath();
         this.ctx.moveTo(this.player.x + this.player.width / 2, this.player.y); // Top point
         this.ctx.lineTo(this.player.x + this.player.width, this.player.y + this.player.height); // Bottom right
@@ -253,38 +274,114 @@ class Game {
         this.ctx.closePath();
         this.ctx.fill();
 
-        // Draw cockpit
-        this.ctx.fillStyle = '#D3D3D3'; // Lighter silver for cockpit
+        // Wing details
+        this.ctx.strokeStyle = '#666666';
+        this.ctx.lineWidth = 2;
+        // Left wing detail
         this.ctx.beginPath();
-        this.ctx.moveTo(this.player.x + this.player.width / 2, this.player.y + 10);
-        this.ctx.lineTo(this.player.x + this.player.width / 2 + 8, this.player.y + 20);
-        this.ctx.lineTo(this.player.x + this.player.width / 2 - 8, this.player.y + 20);
+        this.ctx.moveTo(this.player.x + 5, this.player.y + this.player.height - 5);
+        this.ctx.lineTo(this.player.x + this.player.width * 0.3, this.player.y + this.player.height * 0.3);
+        this.ctx.stroke();
+        // Right wing detail
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width - 5, this.player.y + this.player.height - 5);
+        this.ctx.lineTo(this.player.x + this.player.width * 0.7, this.player.y + this.player.height * 0.3);
+        this.ctx.stroke();
+
+        // Cockpit - glass effect with gradient
+        const cockpitGradient = this.ctx.createLinearGradient(
+            this.player.x + this.player.width * 0.3, this.player.y + 10,
+            this.player.x + this.player.width * 0.7, this.player.y + 25
+        );
+        cockpitGradient.addColorStop(0, '#84D9FF');
+        cockpitGradient.addColorStop(0.5, '#C4E9FF');
+        cockpitGradient.addColorStop(1, '#84D9FF');
+        
+        this.ctx.fillStyle = cockpitGradient;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width * 0.5, this.player.y + 8);
+        this.ctx.lineTo(this.player.x + this.player.width * 0.7, this.player.y + 25);
+        this.ctx.lineTo(this.player.x + this.player.width * 0.3, this.player.y + 25);
         this.ctx.closePath();
         this.ctx.fill();
+        this.ctx.strokeStyle = '#4DA4CC';
+        this.ctx.stroke();
 
-        // Draw engine glow
-        this.ctx.fillStyle = '#ff4400';
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.player.x + this.player.width / 2 - 10, this.player.y + this.player.height);
-        this.ctx.lineTo(this.player.x + this.player.width / 2 + 10, this.player.y + this.player.height);
-        this.ctx.lineTo(this.player.x + this.player.width / 2, this.player.y + this.player.height + 5);
-        this.ctx.closePath();
-        this.ctx.fill();
-
-        // Restore the context to its original state
         this.ctx.restore();
+    }
+    
+    drawEngineFlames() {
+        // Update flame animation
+        this.flameTime += 0.1;
+        this.flameSize = Math.sin(this.flameTime) * 3;
+
+        // Main flame
+        const flameGradient = this.ctx.createLinearGradient(
+            this.player.x + this.player.width / 2,
+            this.player.y + this.player.height,
+            this.player.x + this.player.width / 2,
+            this.player.y + this.player.height + 20 + this.flameSize
+        );
+        flameGradient.addColorStop(0, '#FF4400');
+        flameGradient.addColorStop(0.4, '#FF7700');
+        flameGradient.addColorStop(0.7, '#FFAA00');
+        flameGradient.addColorStop(1, 'rgba(255, 170, 0, 0)');
+
+        this.ctx.fillStyle = flameGradient;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width / 2 - 8, this.player.y + this.player.height);
+        this.ctx.quadraticCurveTo(
+            this.player.x + this.player.width / 2,
+            this.player.y + this.player.height + 25 + this.flameSize,
+            this.player.x + this.player.width / 2 + 8,
+            this.player.y + this.player.height
+        );
+        this.ctx.fill();
+
+        // Inner flame (brighter)
+        const innerFlameGradient = this.ctx.createLinearGradient(
+            this.player.x + this.player.width / 2,
+            this.player.y + this.player.height,
+            this.player.x + this.player.width / 2,
+            this.player.y + this.player.height + 15 + this.flameSize
+        );
+        innerFlameGradient.addColorStop(0, '#FFFF00');
+        innerFlameGradient.addColorStop(0.5, '#FFAA00');
+        innerFlameGradient.addColorStop(1, 'rgba(255, 170, 0, 0)');
+
+        this.ctx.fillStyle = innerFlameGradient;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width / 2 - 4, this.player.y + this.player.height);
+        this.ctx.quadraticCurveTo(
+            this.player.x + this.player.width / 2,
+            this.player.y + this.player.height + 15 + this.flameSize,
+            this.player.x + this.player.width / 2 + 4,
+            this.player.y + this.player.height
+        );
+        this.ctx.fill();
     }
     
     draw() {
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, this.width, this.height);
         
-        // Draw stars first (background)
         this.drawStars();
         
-        // Draw player
-        this.drawPlayer();
-        
+        // Draw victory trail
+        if (this.victory && this.victoryAnimation.active) {
+            this.victoryAnimation.trail.forEach(particle => {
+                this.ctx.fillStyle = `rgba(${this.hexToRgb(particle.color)}, ${particle.life})`;
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                this.ctx.fill();
+            });
+        }
+
+        // Draw player if still on screen
+        if (this.player.y > -this.player.height) {
+            this.drawPlayer();
+        }
+
         // Draw bullets
         this.drawBullets();
         
@@ -740,6 +837,53 @@ class Game {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
         });
+    }
+
+    updateVictoryAnimation() {
+        if (!this.victoryAnimation.active) {
+            this.victoryAnimation.active = true;
+            this.victoryAnimation.speed = 2;
+        }
+
+        // Accelerate ship upward
+        this.victoryAnimation.speed = Math.min(
+            this.victoryAnimation.speed + this.victoryAnimation.acceleration,
+            this.victoryAnimation.maxSpeed
+        );
+        this.player.y -= this.victoryAnimation.speed;
+
+        // Add trail particles
+        for (let i = 0; i < 3; i++) {
+            this.victoryAnimation.trail.push({
+                x: this.player.x + this.player.width / 2 + (Math.random() - 0.5) * 20,
+                y: this.player.y + this.player.height,
+                size: 3 + Math.random() * 3,
+                color: ['#FF4400', '#FF7700', '#FFAA00'][Math.floor(Math.random() * 3)],
+                life: 1.0,
+                vy: Math.random() * 2
+            });
+        }
+
+        // Update trail particles
+        this.victoryAnimation.trail.forEach((particle, index) => {
+            particle.y += particle.vy;
+            particle.life -= 0.02;
+            if (particle.life <= 0) {
+                this.victoryAnimation.trail.splice(index, 1);
+            }
+        });
+
+        // Show restart button when ship is off screen
+        if (this.player.y < -this.player.height) {
+            this.restartButton.style.display = 'block';
+        }
+    }
+
+    hexToRgb(hex) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `${r}, ${g}, ${b}`;
     }
 }
 
