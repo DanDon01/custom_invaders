@@ -113,6 +113,101 @@
                 margin-top: 40px;
             }
         }
+
+        /* Add these grid styles */
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1px;
+            background: #333;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background: #000;
+            border: 1px solid #444;
+            cursor: pointer;
+        }
+
+        .selected-grid {
+            box-shadow: 0 0 10px #00ff00;
+            transform: scale(1.02);
+        }
+
+        .grid:hover {
+            transform: scale(1.02);
+        }
+
+        /* Pre-designed aliens styles */
+        .pre-designed-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pre-designed-alien {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1px;
+            background: #222;
+            padding: 3px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 80px;
+        }
+
+        .pre-designed-alien:hover {
+            background: #444;
+        }
+
+        .pre-designed-alien .cell {
+            width: 8px;
+            height: 8px;
+            border: none;
+        }
+
+        /* Add responsive grid styles */
+        @media (max-width: 768px) {
+            #grid-container {
+                grid-template-columns: 1fr;  /* Stack grids vertically on mobile */
+                gap: 30px;
+            }
+
+            .cell {
+                width: 25px;  /* Slightly smaller cells on mobile */
+                height: 25px;
+            }
+
+            .grid-wrapper {
+                justify-content: center;
+            }
+
+            .pre-designed-alien {
+                width: 60px;  /* Smaller preview on mobile */
+            }
+
+            .pre-designed-alien .cell {
+                width: 6px;
+                height: 6px;
+            }
+        }
     </style>
 </head>
 <body>
