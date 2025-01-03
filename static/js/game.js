@@ -462,32 +462,46 @@ class Game {
         const rightButton = document.getElementById('rightButton');
         const fireButton = document.getElementById('fireButton');
 
-        // Handle touch events for movement
-        leftButton.addEventListener('touchstart', (e) => {
+        // Handle both mouse and touch events for movement
+        // Left button
+        const handleLeftDown = (e) => {
             e.preventDefault();
             this.keys['ArrowLeft'] = true;
-        });
-        leftButton.addEventListener('touchend', (e) => {
+        };
+        const handleLeftUp = (e) => {
             e.preventDefault();
             this.keys['ArrowLeft'] = false;
-        });
+        };
+        leftButton.addEventListener('mousedown', handleLeftDown);
+        leftButton.addEventListener('mouseup', handleLeftUp);
+        leftButton.addEventListener('mouseleave', handleLeftUp);
+        leftButton.addEventListener('touchstart', handleLeftDown);
+        leftButton.addEventListener('touchend', handleLeftUp);
 
-        rightButton.addEventListener('touchstart', (e) => {
+        // Right button
+        const handleRightDown = (e) => {
             e.preventDefault();
             this.keys['ArrowRight'] = true;
-        });
-        rightButton.addEventListener('touchend', (e) => {
+        };
+        const handleRightUp = (e) => {
             e.preventDefault();
             this.keys['ArrowRight'] = false;
-        });
+        };
+        rightButton.addEventListener('mousedown', handleRightDown);
+        rightButton.addEventListener('mouseup', handleRightUp);
+        rightButton.addEventListener('mouseleave', handleRightUp);
+        rightButton.addEventListener('touchstart', handleRightDown);
+        rightButton.addEventListener('touchend', handleRightUp);
 
-        // Handle touch events for firing
-        fireButton.addEventListener('touchstart', (e) => {
+        // Fire button
+        const handleFire = (e) => {
             e.preventDefault();
             if (!this.gameOver) {
                 this.shoot();
             }
-        });
+        };
+        fireButton.addEventListener('mousedown', handleFire);
+        fireButton.addEventListener('touchstart', handleFire);
 
         // Prevent default touch behaviors
         document.addEventListener('touchmove', (e) => {
@@ -495,6 +509,13 @@ class Game {
                 e.preventDefault();
             }
         }, { passive: false });
+
+        // Prevent context menu on long press
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.classList.contains('control-button')) {
+                e.preventDefault();
+            }
+        });
     }
 }
 
