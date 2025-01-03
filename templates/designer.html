@@ -23,6 +23,7 @@
             border-radius: 15px;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
         }
 
         h1 {
@@ -356,12 +357,51 @@
                 margin: 10px;
             }
         }
+
+        .scrolling-text-container {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .scrolling-text {
+            color: #00ff00;
+            font-size: 18px;
+            white-space: nowrap;
+            animation: scroll 30s linear infinite;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scrolling-text {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="marquee-container">
         <div class="marquee-border"></div>
         <div class="container">
+            <div class="scrolling-text-container">
+                <div class="scrolling-text">
+                    Draw on each grid to design your own aliens to battle against, or choose from the pre designs to get straight into the game! &nbsp;&nbsp;&nbsp;
+                    Draw on each grid to design your own aliens to battle against, or choose from the pre designs to get straight into the game! &nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
             <h1>Design Your Aliens</h1>
             <div class="designer-container">
                 <div id="grid-container">
