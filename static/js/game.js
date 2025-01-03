@@ -17,7 +17,8 @@ class Game {
         // Bullet properties
         this.bullets = [];
         this.bulletSpeed = 7;
-        this.maxBullets = 2;  // Maximum bullets allowed on screen
+        this.maxBullets = 2;
+        this.bulletTrailParticles = [];  // Add bullet trail effect
         
         // Alien properties
         this.aliens = [];
@@ -26,7 +27,7 @@ class Game {
         this.alienDirection = 1;
         this.alienStepDown = 20;
         this.alienMoveSpeed = 0.5;
-        this.alienSpeedIncrease = 0.2;
+        this.alienSpeedIncrease = 0.4;
         this.alienSpacing = {
             x: 70,
             y: 60
@@ -60,9 +61,6 @@ class Game {
         // Add fireworks array
         this.fireworks = [];
         
-        // Setup restart button
-        this.setupRestartButton();
-        
         // Setup restart dialog
         this.setupRestartDialog();
     }
@@ -80,6 +78,9 @@ class Game {
     }
     
     initializeAliens() {
+        // Clear existing aliens first
+        this.aliens = [];
+        
         const startX = 10;
         const startY = 30;
         
@@ -111,13 +112,13 @@ class Game {
     }
     
     shoot() {
-        // Only shoot if we haven't reached max bullets
         if (this.bullets.length < this.maxBullets) {
             this.bullets.push({
                 x: this.player.x + this.player.width / 2,
                 y: this.player.y,
-                width: 3,
-                height: 15
+                width: 5,  // Slightly wider bullet
+                height: 20, // Longer bullet
+                color: '#ff9933'
             });
         }
     }
@@ -152,14 +153,9 @@ class Game {
             this.player.x = Math.min(this.width - this.player.width, this.player.x + this.player.speed);
         }
         
-        // Update bullets
-        this.bullets.forEach((bullet, index) => {
-            bullet.y -= this.bulletSpeed;
-            if (bullet.y < 0) {
-                this.bullets.splice(index, 1);
-            }
-        });
-        
+        // Update bullets and their trails
+        this.updateBullets();
+
         // Move aliens
         let touchedEdge = false;
         this.aliens.forEach(alien => {
@@ -183,6 +179,18 @@ class Game {
         // Check collisions
         this.checkCollisions();
         this.checkShipCollision();
+
+        // Check if aliens reach bottom
+        this.aliens.forEach(alien => {
+            if (alien.alive && alien.y + alien.height >= this.height) {
+                alien.alive = false;  // Destroy the alien
+                this.createExplosion(
+                    alien.x + alien.width / 2,
+                    alien.y + alien.height / 2,
+                    this.getMainColor(alien.design)
+                );
+            }
+        });
     }
     
     checkCollisions() {
@@ -278,10 +286,7 @@ class Game {
         this.drawPlayer();
         
         // Draw bullets
-        this.ctx.fillStyle = '#ff9933';
-        this.bullets.forEach(bullet => {
-            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        });
+        this.drawBullets();
         
         // Draw aliens
         this.aliens.forEach(alien => {
@@ -361,16 +366,36 @@ class Game {
     
     createExplosion(x, y, color) {
         const particles = [];
-        for (let i = 0; i < this.explosionParticles; i++) {
-            const angle = (Math.PI * 2 / this.explosionParticles) * i;
-            const speed = 2 + Math.random() * 2;
+        // More particles for bigger explosion
+        for (let i = 0; i < 30; i++) {
+            const angle = (Math.PI * 2 / 30) * i;
+            const speed = 2 + Math.random() * 4;
+            const size = 2 + Math.random() * 3;
             particles.push({
                 x: x,
                 y: y,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 life: 1.0,
-                color: color
+                color: color,
+                size: size,
+                spin: Math.random() * Math.PI * 2,
+                spinSpeed: (Math.random() - 0.5) * 0.2
+            });
+        }
+        // Add some sparkles
+        for (let i = 0; i < 20; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1 + Math.random() * 3;
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 0.8,
+                color: '#ffffff',
+                size: 1,
+                isSparkle: true
             });
         }
         this.explosions.push(particles);
@@ -411,10 +436,23 @@ class Game {
     drawExplosions() {
         this.explosions.forEach(particles => {
             particles.forEach(particle => {
-                this.ctx.fillStyle = `rgba(${particle.color}, ${particle.life})`;
-                this.ctx.beginPath();
-                this.ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
-                this.ctx.fill();
+                this.ctx.save();
+                if (particle.isSparkle) {
+                    // Draw sparkles
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${particle.life})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                } else {
+                    // Draw main explosion particles
+                    this.ctx.translate(particle.x, particle.y);
+                    this.ctx.rotate(particle.spin);
+                    this.ctx.fillStyle = `rgba(${particle.color}, ${particle.life})`;
+                    this.ctx.fillRect(-particle.size/2, -particle.size/2, 
+                                    particle.size, particle.size);
+                    particle.spin += particle.spinSpeed;
+                }
+                this.ctx.restore();
             });
         });
     }
@@ -541,14 +579,8 @@ class Game {
         });
     }
 
-    setupRestartButton() {
-        this.restartButton = document.getElementById('restartButton');
-        this.restartButton.addEventListener('click', () => {
-            this.resetGame();
-        });
-    }
-
     setupRestartDialog() {
+        this.restartButton = document.getElementById('restartButton');
         this.restartDialog = document.getElementById('restartDialog');
         const continueButton = document.getElementById('continueButton');
         const redesignButton = document.getElementById('redesignButton');
@@ -580,7 +612,7 @@ class Game {
         this.explosions = [];
         this.fireworks = [];
         
-        // Reset aliens to original positions
+        // Clear and reset aliens to original positions
         this.initializeAliens();
         
         // Hide restart button and dialog
@@ -646,6 +678,67 @@ class Game {
                 this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
                 this.ctx.fill();
             });
+        });
+    }
+
+    updateBullets() {
+        // Update bullet positions
+        this.bullets.forEach((bullet, index) => {
+            bullet.y -= this.bulletSpeed;
+            
+            // Add trail particles
+            if (Math.random() < 0.5) {
+                this.bulletTrailParticles.push({
+                    x: bullet.x + bullet.width / 2,
+                    y: bullet.y + bullet.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: Math.random() * 2,
+                    life: 1.0,
+                    color: bullet.color
+                });
+            }
+            
+            if (bullet.y < 0) {
+                this.bullets.splice(index, 1);
+            }
+        });
+
+        // Update trail particles
+        this.bulletTrailParticles.forEach((particle, index) => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.life -= 0.05;
+            if (particle.life <= 0) {
+                this.bulletTrailParticles.splice(index, 1);
+            }
+        });
+    }
+
+    drawBullets() {
+        // Draw bullet trails
+        this.bulletTrailParticles.forEach(particle => {
+            this.ctx.fillStyle = `rgba(255, 153, 51, ${particle.life * 0.5})`;
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+
+        // Draw bullets
+        this.bullets.forEach(bullet => {
+            // Bullet glow effect
+            const gradient = this.ctx.createRadialGradient(
+                bullet.x + bullet.width / 2, bullet.y + bullet.height / 2, 0,
+                bullet.x + bullet.width / 2, bullet.y + bullet.height / 2, 10
+            );
+            gradient.addColorStop(0, '#ff9933');
+            gradient.addColorStop(1, 'rgba(255, 153, 51, 0)');
+            
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(bullet.x - 5, bullet.y - 5, bullet.width + 10, bullet.height + 10);
+            
+            // Bullet core
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
         });
     }
 }
