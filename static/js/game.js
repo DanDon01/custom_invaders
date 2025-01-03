@@ -37,6 +37,13 @@ class Game {
         this.keys = {};
         this.setupControls();
         this.loadAliens();
+        
+        // Add star field properties
+        this.stars = this.initStars(100);  // Create 100 stars
+        
+        // Add explosion properties
+        this.explosions = [];
+        this.explosionParticles = 15;  // Particles per explosion
     }
     
     async loadAliens() {
@@ -93,6 +100,9 @@ class Game {
     
     update() {
         if (this.gameOver || this.victory) return;
+        
+        this.updateStars();
+        this.updateExplosions();
         
         // Check for victory condition
         const remainingAliens = this.aliens.filter(alien => alien.alive).length;
@@ -155,6 +165,14 @@ class Game {
                     alien.alive = false;
                     this.bullets.splice(bulletIndex, 1);
                     this.score += 100;
+
+                    // Create explosion using alien's colors
+                    const mainColor = this.getMainColor(alien.design);
+                    this.createExplosion(
+                        alien.x + alien.width / 2,
+                        alien.y + alien.height / 2,
+                        mainColor
+                    );
                 }
             });
         });
@@ -200,7 +218,10 @@ class Game {
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, this.width, this.height);
         
-        // Draw player using new method
+        // Draw stars first (background)
+        this.drawStars();
+        
+        // Draw player
         this.drawPlayer();
         
         // Draw bullets
@@ -215,6 +236,9 @@ class Game {
                 this.drawAlien(alien);
             }
         });
+
+        // Draw explosions
+        this.drawExplosions();
         
         // Draw score and lives
         this.ctx.fillStyle = 'white';
@@ -262,6 +286,107 @@ class Game {
         this.aliens.forEach(alien => {
             alien.y -= this.alienStepDown * 3;
         });
+    }
+    
+    initStars(count) {
+        const stars = [];
+        for (let i = 0; i < count; i++) {
+            stars.push({
+                x: Math.random() * this.width,
+                y: Math.random() * this.height,
+                speed: 0.5 + Math.random() * 2,
+                size: Math.random() * 2
+            });
+        }
+        return stars;
+    }
+    
+    createExplosion(x, y, color) {
+        const particles = [];
+        for (let i = 0; i < this.explosionParticles; i++) {
+            const angle = (Math.PI * 2 / this.explosionParticles) * i;
+            const speed = 2 + Math.random() * 2;
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 1.0,
+                color: color
+            });
+        }
+        this.explosions.push(particles);
+    }
+    
+    updateStars() {
+        this.stars.forEach(star => {
+            star.y += star.speed;
+            if (star.y > this.height) {
+                star.y = 0;
+                star.x = Math.random() * this.width;
+            }
+        });
+    }
+    
+    updateExplosions() {
+        this.explosions.forEach((particles, explosionIndex) => {
+            particles.forEach(particle => {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.life -= 0.02;
+            });
+
+            // Remove dead explosions
+            if (particles[0].life <= 0) {
+                this.explosions.splice(explosionIndex, 1);
+            }
+        });
+    }
+    
+    drawStars() {
+        this.ctx.fillStyle = 'white';
+        this.stars.forEach(star => {
+            this.ctx.fillRect(star.x, star.y, star.size, star.size);
+        });
+    }
+    
+    drawExplosions() {
+        this.explosions.forEach(particles => {
+            particles.forEach(particle => {
+                this.ctx.fillStyle = `rgba(${particle.color}, ${particle.life})`;
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+                this.ctx.fill();
+            });
+        });
+    }
+    
+    getMainColor(design) {
+        // Get the most used color in the alien design
+        const colorCounts = {};
+        Object.values(design).forEach(color => {
+            colorCounts[color] = (colorCounts[color] || 0) + 1;
+        });
+        
+        let mainColor = Object.entries(design)[0]?.[1] || '255,255,255';
+        let maxCount = 0;
+        
+        Object.entries(colorCounts).forEach(([color, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                mainColor = color;
+            }
+        });
+        
+        // Convert hex to RGB if necessary
+        if (mainColor.startsWith('#')) {
+            const r = parseInt(mainColor.slice(1, 3), 16);
+            const g = parseInt(mainColor.slice(3, 5), 16);
+            const b = parseInt(mainColor.slice(5, 7), 16);
+            return `${r},${g},${b}`;
+        }
+        
+        return mainColor;
     }
 }
 
