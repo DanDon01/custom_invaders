@@ -28,8 +28,8 @@ class Game {
         this.alienMoveSpeed = 0.5;
         this.alienSpeedIncrease = 0.2;
         this.alienSpacing = {
-            x: 60,
-            y: 50
+            x: 70,
+            y: 60
         };
         
         // Game state
@@ -52,7 +52,7 @@ class Game {
         
         // Add invulnerability timer for ship after hit
         this.invulnerableTime = 0;
-        this.invulnerableDuration = 120; // 2 seconds at 60fps
+        this.invulnerableDuration = 6; // 0.1 seconds at 60fps
     }
     
     async loadAliens() {
@@ -68,7 +68,7 @@ class Game {
     }
     
     initializeAliens() {
-        const startX = 20;
+        const startX = 10;
         const startY = 30;
         
         for (let row = 0; row < this.alienRows; row++) {
@@ -76,8 +76,8 @@ class Game {
                 this.aliens.push({
                     x: startX + col * this.alienSpacing.x,
                     y: startY + row * this.alienSpacing.y,
-                    width: 45,
-                    height: 45,
+                    width: 55,
+                    height: 55,
                     design: this.alienDesigns[row],
                     alive: true
                 });
@@ -199,8 +199,24 @@ class Game {
             return; // Skip drawing to create flashing effect
         }
 
+        // Determine tilt based on movement
+        let tilt = 0;
+        if (this.keys['ArrowLeft']) {
+            tilt = -10; // Tilt left
+        } else if (this.keys['ArrowRight']) {
+            tilt = 10; // Tilt right
+        }
+
+        // Save the current context state
+        this.ctx.save();
+
+        // Translate and rotate the context for tilting effect
+        this.ctx.translate(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
+        this.ctx.rotate(tilt * Math.PI / 180);
+        this.ctx.translate(-this.player.x - this.player.width / 2, -this.player.y - this.player.height / 2);
+
         // Draw the ship body
-        this.ctx.fillStyle = '#00ff00';
+        this.ctx.fillStyle = '#C0C0C0'; // Silver color
         this.ctx.beginPath();
         this.ctx.moveTo(this.player.x + this.player.width / 2, this.player.y); // Top point
         this.ctx.lineTo(this.player.x + this.player.width, this.player.y + this.player.height); // Bottom right
@@ -209,7 +225,7 @@ class Game {
         this.ctx.fill();
 
         // Draw cockpit
-        this.ctx.fillStyle = '#80ff80';
+        this.ctx.fillStyle = '#D3D3D3'; // Lighter silver for cockpit
         this.ctx.beginPath();
         this.ctx.moveTo(this.player.x + this.player.width / 2, this.player.y + 10);
         this.ctx.lineTo(this.player.x + this.player.width / 2 + 8, this.player.y + 20);
@@ -225,6 +241,9 @@ class Game {
         this.ctx.lineTo(this.player.x + this.player.width / 2, this.player.y + this.player.height + 5);
         this.ctx.closePath();
         this.ctx.fill();
+
+        // Restore the context to its original state
+        this.ctx.restore();
     }
     
     draw() {

@@ -38,4 +38,25 @@
     display: flex;
     gap: 10px;
     margin-top: 20px;
+}
+
+.pre-designed-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pre-designed-alien {
+    display: inline-block;
+    margin: 10px;
+    padding: 5px;
+    background: #222;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pre-designed-alien .cell {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    margin: 1px;
 } 
