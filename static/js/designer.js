@@ -151,12 +151,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // First, move the handleTouch function definition to the top level
+    function handleTouch(e) {
+        e.preventDefault(); // Prevent scrolling
+        const touch = e.touches[0];
+        const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (cell && cell.classList.contains('cell')) {
+            const fillCell = function() {
+                const gridId = parseInt(this.parentElement.dataset.gridId);
+                const index = parseInt(this.dataset.index);
+                const color = colorPicker.value;
+                this.style.backgroundColor = color;
+                alienDesigns[gridId][index] = color;
+            };
+            fillCell.call(cell);
+        }
+    }
+    
     // Create grids with pre-designed options
     for (let g = 0; g < 4; g++) {
         const gridWrapper = document.createElement('div');
         gridWrapper.className = 'grid-wrapper';
         
-        // Create main grid
         const grid = document.createElement('div');
         grid.className = 'grid';
         grid.dataset.gridId = g;
@@ -166,6 +183,10 @@ document.addEventListener('DOMContentLoaded', function() {
             currentGrid = parseInt(this.dataset.gridId);
             updateSelectedGridStyle();
         });
+        
+        // Add touch event listeners to the grid
+        grid.addEventListener('touchstart', handleTouch, { passive: false });
+        grid.addEventListener('touchmove', handleTouch, { passive: false });
         
         for (let i = 0; i < 64; i++) {
             const cell = document.createElement('div');
@@ -177,28 +198,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const index = parseInt(this.dataset.index);
                 
                 if (erase) {
-                    // Erase the cell (set to black)
                     this.style.backgroundColor = '#000';
                     delete alienDesigns[gridId][index];
                 } else {
-                    // Fill with selected color
                     const color = colorPicker.value;
                     this.style.backgroundColor = color;
                     alienDesigns[gridId][index] = color;
                 }
             };
             
-            // Handle left click/drag
+            // Mouse events
             cell.addEventListener('mousedown', function(e) {
                 if (e.button === 0) fillCell.call(this, false);
                 if (e.button === 2) fillCell.call(this, true);
             });
             
-            // Handle mouse movement
             cell.addEventListener('mouseenter', function() {
                 if (isMouseDown) fillCell.call(this, false);
                 if (isRightMouseDown) fillCell.call(this, true);
             });
+            
+            // Add touch events to individual cells as well
+            cell.addEventListener('touchstart', handleTouch, { passive: false });
+            cell.addEventListener('touchmove', handleTouch, { passive: false });
             
             grid.appendChild(cell);
         }
@@ -263,35 +285,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make loadAlienSet function globally accessible
     window.loadAlienSet = loadAlienSet;
-    
-    // Add touch event handlers for mobile
-    function handleTouch(e) {
-        e.preventDefault(); // Prevent scrolling
-        const touch = e.touches[0];
-        const cell = document.elementFromPoint(touch.clientX, touch.clientY);
-        
-        if (cell && cell.classList.contains('cell')) {
-            fillCell.call(cell, false);
-        }
-    }
-
-    // Add these touch event listeners to each grid
-    for (let g = 0; g < 4; g++) {
-        const gridWrapper = document.createElement('div');
-        gridWrapper.className = 'grid-wrapper';
-        
-        const grid = document.createElement('div');
-        grid.className = 'grid';
-        grid.dataset.gridId = g;
-
-        // Add touch event listeners
-        grid.addEventListener('touchstart', handleTouch, { passive: false });
-        grid.addEventListener('touchmove', handleTouch, { passive: false });
-        
-        // ... rest of the grid creation code ...
-    }
-
-    // Add this to prevent default touch behavior on the entire grid container
-    gridContainer.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
-    gridContainer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 }); 
