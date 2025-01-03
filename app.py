@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from game_state import GameState
+import os
 
 app = Flask(__name__)
 game_state = GameState()
@@ -31,4 +32,5 @@ def get_aliens():
     return jsonify({'aliens': game_state.alien_designs})
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port) 

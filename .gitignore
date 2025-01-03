@@ -398,3 +398,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Python environment variables
+.env
+
+# Python virtual environment files
+.DS_Store
