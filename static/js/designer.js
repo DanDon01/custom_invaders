@@ -58,15 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add this after the existing preDesignedAliens array
     const alienSets = {
-        classic: [
-            // Your existing classic space invader designs
-            { /* ... */ },
-            { /* ... */ },
-            { /* ... */ },
-            { /* ... */ }
-        ],
+        classic: preDesignedAliens, // Use the existing preDesignedAliens for classic set
         simpsons: [
-            // The Simpsons-style aliens you provided
             {
                 // Row 1: top row of yellow
                 9: '#ffff00', 10: '#ffff00', 11: '#ffff00', 12: '#ffff00',
@@ -80,27 +73,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 36: '#ffff00', 37: '#ffff00',
                 // Optional row 5 for a chin or neck
                 43: '#ffff00'
-              }
-
+            },
             {
-                    // Just an example pattern of columns for the top portion
-                    // Row 1: narrower top
+                // Just an example pattern of columns for the top portion
+                // Row 1: narrower top
                 11: '#ffff00', 12: '#ffff00',
-                    // Row 2: a bigger band of yellow
+                // Row 2: a bigger band of yellow
                 17: '#ffff00', 18: '#ffff00', 19: '#ffff00', 20: '#ffff00',
-                    // Row 3: white eyes in the middle
+                // Row 3: white eyes in the middle
                 26: '#ffffff', 27: '#ffffff', 
-                    // Row 4: more yellow
+                // Row 4: more yellow
                 32: '#ffff00', 33: '#ffff00', 34: '#ffff00', 35: '#ffff00',
                 36: '#ffff00', 37: '#ffff00',
-                    // Row 5: a small "neck" or bottom
+                // Row 5: a small "neck" or bottom
                 42: '#ffff00'
             },
-
             {
                 // Large rectangle of blue in the upper rows
                 // Row 1
-                8: '#0000ff',  9: '#0000ff',  10: '#0000ff', 11: '#0000ff',
+                8: '#0000ff', 9: '#0000ff', 10: '#0000ff', 11: '#0000ff',
                 12: '#0000ff', 13: '#0000ff', 14: '#0000ff', 15: '#0000ff',
                 // Row 2
                 16: '#0000ff', 17: '#0000ff', 18: '#0000ff', 19: '#0000ff',
@@ -108,15 +99,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Row 3
                 24: '#0000ff', 25: '#0000ff', 26: '#0000ff', 27: '#0000ff',
                 28: '#0000ff', 29: '#0000ff', 30: '#0000ff', 31: '#0000ff',
-                // Row 4: yellow “belt”
+                // Row 4: yellow "belt"
                 32: '#ffff00', 33: '#ffff00', 34: '#ffff00', 35: '#ffff00',
                 36: '#ffff00', 37: '#ffff00', 38: '#ffff00', 39: '#ffff00',
-                // Row 5: white “feet”
+                // Row 5: white "feet"
                 40: '#ffffff', 41: '#ffffff', 42: '#ffffff', 43: '#ffffff',
                 44: '#ffffff', 45: '#ffffff', 46: '#ffffff', 47: '#ffffff'
-              },
-
-              {
+            },
+            {
                 // Row 1: top row of yellow
                 9: '#ffff00', 10: '#ffff00', 11: '#ffff00', 12: '#ffff00',
                 // Row 2: big band of yellow
@@ -129,16 +119,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 36: '#ffff00', 37: '#ffff00',
                 // Optional row 5 for a chin or neck
                 43: '#ffff00'
-              }
-
-            // ... rest of your Simpsons designs
+            }
         ],
         retro: [
-            // Placeholder for retro set
-            { /* Simple retro design 1 */ },
-            { /* Simple retro design 2 */ },
-            { /* Simple retro design 3 */ },
-            { /* Simple retro design 4 */ }
+            // Simple placeholder designs for now
+            { 17: '#ff0000', 18: '#ff0000', 21: '#ff0000', 22: '#ff0000',
+              25: '#ff0000', 26: '#ff0000', 29: '#ff0000', 30: '#ff0000' },
+            { 16: '#00ff00', 17: '#00ff00', 22: '#00ff00', 23: '#00ff00',
+              24: '#00ff00', 25: '#00ff00', 30: '#00ff00', 31: '#00ff00' },
+            { 18: '#0000ff', 19: '#0000ff', 20: '#0000ff', 21: '#0000ff',
+              26: '#0000ff', 27: '#0000ff', 28: '#0000ff', 29: '#0000ff' },
+            { 19: '#ff00ff', 20: '#ff00ff', 27: '#ff00ff', 28: '#ff00ff',
+              35: '#ff00ff', 36: '#ff00ff', 43: '#ff00ff', 44: '#ff00ff' }
         ]
     };
     
@@ -274,4 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = '/game';
         }
     });
+    
+    // Make loadAlienSet function globally accessible
+    window.loadAlienSet = loadAlienSet;
 }); 
