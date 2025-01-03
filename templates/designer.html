@@ -457,35 +457,33 @@
                 </div>
             </div>
             <h1>Design Your Aliens</h1>
-            <div class="designer-container">
-                <div id="grid-container">
-                    <!-- 4 grids will be generated here -->
-                </div>
-                <div class="controls">
-                    <div class="color-picker-container">
-                        <div class="color-picker-label">Current Colour</div>
-                        <div class="color-picker">
-                            <div class="click-hint">Click to change color!</div>
-                            <input type="color" id="colorPicker" value="#00ff00">
-                        </div>
-                    </div>
-                    <div class="alien-sets">
-                        <h3 class="sets-title">Choose Preset Aliens</h3>
-                        <div class="set-buttons">
-                            <button class="set-button" onclick="loadAlienSet('classic')">Classic Set</button>
-                            <button class="set-button" onclick="loadAlienSet('simpsons')">Simpsons Set</button>
-                            <button class="set-button" onclick="loadAlienSet('retro')">Retro Set</button>
-                        </div>
-                    </div>
-                    <button id="clear-btn">Clear Current Grid</button>
-                    <button id="save-aliens">Save Aliens & Start Game</button>
+            
+            <!-- Add the alien sets first -->
+            <div class="alien-sets">
+                <h3 class="sets-title">Choose Preset Aliens</h3>
+                <div class="set-buttons">
+                    <button class="set-button" onclick="loadAlienSet('classic')">Classic Set</button>
+                    <button class="set-button" onclick="loadAlienSet('simpsons')">Simpsons Set</button>
+                    <button class="set-button" onclick="loadAlienSet('retro')">Retro Set</button>
                 </div>
             </div>
-            <div class="pre-designed-container">
-                <h2>Pre-Designed Aliens</h2>
-                <div id="pre-designed-aliens">
-                    <!-- Pre-designed aliens will be generated here -->
+
+            <!-- Grid container -->
+            <div id="grid-container">
+                <!-- 4 grids will be generated here -->
+            </div>
+
+            <!-- Controls at the bottom -->
+            <div class="controls">
+                <div class="color-picker-container">
+                    <div class="color-picker-label">Current Colour</div>
+                    <div class="color-picker">
+                        <div class="click-hint">Click to change color!</div>
+                        <input type="color" id="colorPicker" value="#00ff00">
+                    </div>
                 </div>
+                <button id="clear-btn">Clear Current Grid</button>
+                <button id="save-aliens">Save Aliens & Start Game</button>
             </div>
         </div>
     </div>
