@@ -65,13 +65,16 @@ class Game {
     }
     
     setupControls() {
-        window.addEventListener('keydown', (e) => this.keys[e.key] = true);
-        window.addEventListener('keyup', (e) => this.keys[e.key] = false);
-        window.addEventListener('keypress', (e) => {
-            if (e.key === ' ' && !this.keys[' ']) {
+        window.addEventListener('keydown', (e) => {
+            this.keys[e.key] = true;
+            // Handle shooting on spacebar press
+            if (e.code === 'Space' && !this.gameOver) {
                 this.shoot();
+                // Prevent page scrolling
+                e.preventDefault();
             }
         });
+        window.addEventListener('keyup', (e) => this.keys[e.key] = false);
     }
     
     shoot() {

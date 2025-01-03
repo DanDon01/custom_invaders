@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentGrid = 0;
     const alienDesigns = [{}, {}, {}, {}];
+    let isMouseDown = false;
+    
+    // Add mouse down/up listeners to document
+    document.addEventListener('mousedown', () => isMouseDown = true);
+    document.addEventListener('mouseup', () => isMouseDown = false);
     
     // Create 4 grids
     for (let g = 0; g < 4; g++) {
@@ -18,13 +23,21 @@ document.addEventListener('DOMContentLoaded', function() {
             cell.className = 'cell';
             cell.dataset.index = i;
             
-            cell.addEventListener('click', function() {
+            // Handle both click and drag
+            const fillCell = function() {
                 const gridId = parseInt(this.parentElement.dataset.gridId);
                 const index = parseInt(this.dataset.index);
                 const color = colorPicker.value;
                 
                 this.style.backgroundColor = color;
                 alienDesigns[gridId][index] = color;
+            };
+            
+            cell.addEventListener('mousedown', fillCell);
+            cell.addEventListener('mouseenter', function() {
+                if (isMouseDown) {
+                    fillCell.call(this);
+                }
             });
             
             grid.appendChild(cell);
