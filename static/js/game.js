@@ -28,8 +28,8 @@ class Game {
         this.alienMoveSpeed = 0.5;
         this.alienSpeedIncrease = 0.2;
         this.alienSpacing = {
-            x: 50,
-            y: 40
+            x: 60,
+            y: 50
         };
         
         // Game state
@@ -49,6 +49,10 @@ class Game {
         // Add explosion properties
         this.explosions = [];
         this.explosionParticles = 15;  // Particles per explosion
+        
+        // Add invulnerability timer for ship after hit
+        this.invulnerableTime = 0;
+        this.invulnerableDuration = 120; // 2 seconds at 60fps
     }
     
     async loadAliens() {
@@ -64,7 +68,7 @@ class Game {
     }
     
     initializeAliens() {
-        const startX = 30;
+        const startX = 20;
         const startY = 30;
         
         for (let row = 0; row < this.alienRows; row++) {
@@ -72,8 +76,8 @@ class Game {
                 this.aliens.push({
                     x: startX + col * this.alienSpacing.x,
                     y: startY + row * this.alienSpacing.y,
-                    width: 35,
-                    height: 35,
+                    width: 45,
+                    height: 45,
                     design: this.alienDesigns[row],
                     alive: true
                 });
@@ -152,19 +156,12 @@ class Game {
             
             this.aliens.forEach(alien => {
                 alien.y += this.alienStepDown;
-                if (alien.y + alien.height > this.player.y) {
-                    this.lives--;
-                    if (this.lives <= 0) {
-                        this.gameOver = true;
-                    }
-                    this.resetAliens();
-                    this.alienMoveSpeed = 0.5;
-                }
             });
         }
         
         // Check collisions
         this.checkCollisions();
+        this.checkShipCollision();
     }
     
     checkCollisions() {
@@ -197,6 +194,11 @@ class Game {
     }
     
     drawPlayer() {
+        // Make ship flash when invulnerable
+        if (this.invulnerableTime > 0 && Math.floor(this.invulnerableTime / 4) % 2 === 0) {
+            return; // Skip drawing to create flashing effect
+        }
+
         // Draw the ship body
         this.ctx.fillStyle = '#00ff00';
         this.ctx.beginPath();
@@ -398,6 +400,39 @@ class Game {
         }
         
         return mainColor;
+    }
+    
+    checkShipCollision() {
+        // Skip if ship is invulnerable
+        if (this.invulnerableTime > 0) {
+            this.invulnerableTime--;
+            return;
+        }
+
+        this.aliens.forEach(alien => {
+            if (!alien.alive) return;
+
+            if (this.checkCollision(this.player, alien)) {
+                // Create explosion for the alien
+                const mainColor = this.getMainColor(alien.design);
+                this.createExplosion(
+                    alien.x + alien.width / 2,
+                    alien.y + alien.height / 2,
+                    mainColor
+                );
+
+                // Kill the alien
+                alien.alive = false;
+
+                // Reduce lives and set invulnerability
+                this.lives--;
+                this.invulnerableTime = this.invulnerableDuration;
+
+                if (this.lives <= 0) {
+                    this.gameOver = true;
+                }
+            }
+        });
     }
 }
 
