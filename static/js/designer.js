@@ -61,18 +61,15 @@ document.addEventListener('DOMContentLoaded', function() {
         classic: preDesignedAliens, // Use the existing preDesignedAliens for classic set
         simpsons: [
             {
-                // Row 1: top row of yellow
-                9: '#ffff00', 10: '#ffff00', 11: '#ffff00', 12: '#ffff00',
-                // Row 2: big band of yellow
-                16: '#ffff00', 17: '#ffff00', 18: '#ffff00', 19: '#ffff00',
-                20: '#ffff00', 21: '#ffff00', 22: '#ffff00', 23: '#ffff00',
-                // Row 3: white eyes in the middle
-                27: '#ffffff', 28: '#ffffff',
-                // Row 4: fill more yellow
-                32: '#ffff00', 33: '#ffff00', 34: '#ffff00', 35: '#ffff00',
-                36: '#ffff00', 37: '#ffff00',
-                // Optional row 5 for a chin or neck
-                43: '#ffff00'
+                // Grid one Homer
+                2: '#ffff00', 3: '#ffff00', 4: '#ffff00', 5: '#ffff00',
+                9: '#ffff00', 10: '#ffffff', 11: '#ffff00', 12: '#ffff00', 13: '#ffffff', 14: '#ffffff',
+                17: '#ffffff', 19: '#ffffff', 20: '#ffffff', 22: '#ffffff',
+                24: '#ffff00', 25: '#ffffff', 27: '#ffffff', 28: '#ffffff', 30: '#ffffff', 31: '#ffff00',
+                33: '#ffff00', 34: '#ffffff', 35: '#ffff00', 36: '#ffff00', 37: '#ffffff', 38: '#ffff00',
+                41: '#ffff00', 42: '#B39B00', 43: '#B39B00', 44: '#B39B00', 45: '#ffff00,',
+                49: '#B39B00', 50: '#B39B00', 51: '#B39B00', 52: '#B39B00', 
+                57: '#ffff00', 58: '#B39B00', 59: '#B39B00', 60: '#ffff00'
             },
             {
                 // Just an example pattern of columns for the top portion
