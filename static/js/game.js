@@ -56,6 +56,15 @@ class Game {
         
         // Add mobile controls
         this.setupMobileControls();
+        
+        // Add fireworks array
+        this.fireworks = [];
+        
+        // Setup restart button
+        this.setupRestartButton();
+        
+        // Setup restart dialog
+        this.setupRestartDialog();
     }
     
     async loadAliens() {
@@ -114,7 +123,16 @@ class Game {
     }
     
     update() {
-        if (this.gameOver || this.victory) return;
+        if (this.gameOver || this.victory) {
+            // Show restart button
+            this.restartButton.style.display = 'block';
+            
+            // Update fireworks if victory
+            if (this.victory) {
+                this.updateFireworks();
+            }
+            return;
+        }
         
         this.updateStars();
         this.updateExplosions();
@@ -281,6 +299,11 @@ class Game {
         this.ctx.fillText(`Score: ${this.score}`, 10, 30);
         this.ctx.fillText(`Lives: ${this.lives}`, this.width - 100, 30);
         
+        // Draw fireworks on victory
+        if (this.victory) {
+            this.drawFireworks();
+        }
+
         // Draw game over or victory message
         if (this.gameOver) {
             this.ctx.fillStyle = 'red';
@@ -515,6 +538,114 @@ class Game {
             if (e.target.classList.contains('control-button')) {
                 e.preventDefault();
             }
+        });
+    }
+
+    setupRestartButton() {
+        this.restartButton = document.getElementById('restartButton');
+        this.restartButton.addEventListener('click', () => {
+            this.resetGame();
+        });
+    }
+
+    setupRestartDialog() {
+        this.restartDialog = document.getElementById('restartDialog');
+        const continueButton = document.getElementById('continueButton');
+        const redesignButton = document.getElementById('redesignButton');
+
+        this.restartButton.addEventListener('click', () => {
+            this.restartDialog.style.display = 'block';
+            this.restartButton.style.display = 'none';
+        });
+
+        continueButton.addEventListener('click', () => {
+            this.restartDialog.style.display = 'none';
+            this.resetGame();
+        });
+
+        redesignButton.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    }
+
+    resetGame() {
+        // Reset game state
+        this.score = 0;
+        this.lives = 3;
+        this.gameOver = false;
+        this.victory = false;
+        this.alienMoveSpeed = 0.5;  // Reset alien speed
+        this.alienDirection = 1;     // Reset direction
+        this.bullets = [];
+        this.explosions = [];
+        this.fireworks = [];
+        
+        // Reset aliens to original positions
+        this.initializeAliens();
+        
+        // Hide restart button and dialog
+        this.restartButton.style.display = 'none';
+        this.restartDialog.style.display = 'none';
+    }
+
+    createFirework() {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        const x = Math.random() * this.width;
+        const y = this.height;
+        const particles = [];
+        
+        // Create particles for this firework
+        for (let i = 0; i < 50; i++) {
+            const angle = (Math.PI * 2 / 50) * i;
+            const speed = 2 + Math.random() * 3;
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 5, // Initial upward velocity
+                color: colors[Math.floor(Math.random() * colors.length)],
+                life: 1.0,
+                size: 2 + Math.random() * 2
+            });
+        }
+        
+        this.fireworks.push(particles);
+    }
+
+    updateFireworks() {
+        // Add new fireworks randomly when victory
+        if (this.victory && Math.random() < 0.1) {
+            this.createFirework();
+        }
+
+        this.fireworks.forEach((particles, fireworkIndex) => {
+            particles.forEach(particle => {
+                // Apply gravity
+                particle.vy += 0.1;
+                
+                // Update position
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                
+                // Decrease life
+                particle.life -= 0.02;
+            });
+
+            // Remove dead fireworks
+            if (particles[0].life <= 0) {
+                this.fireworks.splice(fireworkIndex, 1);
+            }
+        });
+    }
+
+    drawFireworks() {
+        this.fireworks.forEach(particles => {
+            particles.forEach(particle => {
+                this.ctx.fillStyle = `rgba(${particle.color}, ${particle.life})`;
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                this.ctx.fill();
+            });
         });
     }
 }

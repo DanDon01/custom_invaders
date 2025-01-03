@@ -77,15 +77,97 @@
         #fireButton:active {
             background: rgba(255, 0, 0, 0.4);
         }
+
+        .restart-button {
+            display: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .restart-button:hover {
+            background: #45a049;
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .restart-button:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        .restart-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #444;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .restart-dialog h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .dialog-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .continue-button {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .redesign-button {
+            background: #2196F3;
+            color: white;
+        }
+
+        .dialog-button:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <button id="restartButton" class="restart-button">Play Again!</button>
         <div class="mobile-controls">
             <button id="leftButton" class="control-button">←</button>
             <button id="fireButton" class="control-button">🚀</button>
             <button id="rightButton" class="control-button">→</button>
+        </div>
+    </div>
+    <div id="restartDialog" class="restart-dialog">
+        <h2>Would you like to:</h2>
+        <div class="dialog-buttons">
+            <button id="continueButton" class="dialog-button continue-button">Continue with same aliens</button>
+            <button id="redesignButton" class="dialog-button redesign-button">Redesign aliens</button>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/game.js') }}"></script>
