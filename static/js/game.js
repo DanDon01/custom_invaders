@@ -53,6 +53,9 @@ class Game {
         // Add invulnerability timer for ship after hit
         this.invulnerableTime = 0;
         this.invulnerableDuration = 6; // 0.1 seconds at 60fps
+        
+        // Add mobile controls
+        this.setupMobileControls();
     }
     
     async loadAliens() {
@@ -452,6 +455,46 @@ class Game {
                 }
             }
         });
+    }
+    
+    setupMobileControls() {
+        const leftButton = document.getElementById('leftButton');
+        const rightButton = document.getElementById('rightButton');
+        const fireButton = document.getElementById('fireButton');
+
+        // Handle touch events for movement
+        leftButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.keys['ArrowLeft'] = true;
+        });
+        leftButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.keys['ArrowLeft'] = false;
+        });
+
+        rightButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.keys['ArrowRight'] = true;
+        });
+        rightButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.keys['ArrowRight'] = false;
+        });
+
+        // Handle touch events for firing
+        fireButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!this.gameOver) {
+                this.shoot();
+            }
+        });
+
+        // Prevent default touch behaviors
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.classList.contains('control-button')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     }
 }
 
