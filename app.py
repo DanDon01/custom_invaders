@@ -24,5 +24,11 @@ def save_aliens():
     game_state.set_aliens(aliens_data)
     return jsonify({'success': True})
 
+@app.route('/get_aliens')
+def get_aliens():
+    if not game_state.aliens_designed:
+        return jsonify({'error': 'Aliens not designed yet'}), 400
+    return jsonify({'aliens': game_state.alien_designs})
+
 if __name__ == '__main__':
     app.run(debug=True) 
