@@ -22,10 +22,15 @@ class Game {
         // Alien properties
         this.aliens = [];
         this.alienRows = 4;
-        this.aliensPerRow = 8;
+        this.aliensPerRow = 10;
         this.alienDirection = 1;
         this.alienStepDown = 20;
-        this.alienMoveSpeed = 1;
+        this.alienMoveSpeed = 0.5;
+        this.alienSpeedIncrease = 0.2;
+        this.alienSpacing = {
+            x: 50,
+            y: 40
+        };
         
         // Game state
         this.score = 0;
@@ -59,13 +64,16 @@ class Game {
     }
     
     initializeAliens() {
+        const startX = 30;
+        const startY = 30;
+        
         for (let row = 0; row < this.alienRows; row++) {
             for (let col = 0; col < this.aliensPerRow; col++) {
                 this.aliens.push({
-                    x: col * 60 + 50,
-                    y: row * 50 + 50,
-                    width: 40,
-                    height: 40,
+                    x: startX + col * this.alienSpacing.x,
+                    y: startY + row * this.alienSpacing.y,
+                    width: 35,
+                    height: 35,
                     design: this.alienDesigns[row],
                     alive: true
                 });
@@ -140,6 +148,8 @@ class Game {
         
         if (touchedEdge) {
             this.alienDirection *= -1;
+            this.alienMoveSpeed += this.alienSpeedIncrease;
+            
             this.aliens.forEach(alien => {
                 alien.y += this.alienStepDown;
                 if (alien.y + alien.height > this.player.y) {
@@ -148,6 +158,7 @@ class Game {
                         this.gameOver = true;
                     }
                     this.resetAliens();
+                    this.alienMoveSpeed = 0.5;
                 }
             });
         }
