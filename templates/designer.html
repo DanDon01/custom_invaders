@@ -16,16 +16,30 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-            background: #222;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         h1 {
             color: white;
             text-align: center;
             margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(0, 255, 0, 0.8),
+                             0 0 30px rgba(0, 255, 0, 0.6);
+            }
         }
 
         .controls {
@@ -36,8 +50,36 @@
             margin-top: 30px;
         }
 
+        .color-picker-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .color-picker-label {
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         .color-picker {
+            position: relative;
             margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         #colorPicker {
@@ -48,16 +90,30 @@
             border-radius: 50%;
             cursor: pointer;
             background: transparent;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        #colorPicker::-webkit-color-swatch-wrapper {
-            padding: 0;
-            border-radius: 50%;
+        #colorPicker:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
         }
 
-        #colorPicker::-webkit-color-swatch {
-            border: 3px solid #444;
-            border-radius: 50%;
+        .click-hint {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .color-picker:hover .click-hint {
+            opacity: 1;
         }
 
         button {
@@ -71,6 +127,24 @@
             color: white;
             text-transform: uppercase;
             font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+        }
+
+        button:hover::after {
+            transform: rotate(45deg) translate(50%, 50%);
         }
 
         #clear-btn {
@@ -137,6 +211,8 @@
             padding: 5px;
             border-radius: 4px;
             transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
         }
 
         .cell {
@@ -148,8 +224,20 @@
         }
 
         .selected-grid {
-            box-shadow: 0 0 10px #00ff00;
-            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: selectedPulse 2s infinite;
+        }
+
+        @keyframes selectedPulse {
+            0% {
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            }
         }
 
         .grid:hover {
@@ -218,8 +306,12 @@
                 <!-- 4 grids will be generated here -->
             </div>
             <div class="controls">
-                <div class="color-picker">
-                    <input type="color" id="colorPicker" value="#00ff00">
+                <div class="color-picker-container">
+                    <div class="color-picker-label">Current Colour</div>
+                    <div class="color-picker">
+                        <div class="click-hint">Click to change color!</div>
+                        <input type="color" id="colorPicker" value="#00ff00">
+                    </div>
                 </div>
                 <button id="clear-btn">Clear Current Grid</button>
                 <button id="save-aliens">Save Aliens & Start Game</button>
