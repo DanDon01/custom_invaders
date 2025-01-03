@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-from game_state import GameState
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import os
+import secrets
 
 app = Flask(__name__)
-game_state = GameState()
+app.secret_key = secrets.token_hex(16)  # Generate a secure secret key
 
 @app.route('/')
 def home():
+    # Clear any existing session data when returning to home
+    session.clear()
     return render_template('index.html')
 
 @app.route('/designer')
@@ -15,21 +17,21 @@ def designer():
 
 @app.route('/game')
 def game():
-    if not game_state.aliens_designed:
+    if 'aliens' not in session:
         return redirect(url_for('designer'))
     return render_template('game.html')
 
 @app.route('/save_aliens', methods=['POST'])
 def save_aliens():
     aliens_data = request.json.get('aliens', [])
-    game_state.set_aliens(aliens_data)
+    session['aliens'] = aliens_data
     return jsonify({'success': True})
 
 @app.route('/get_aliens')
 def get_aliens():
-    if not game_state.aliens_designed:
+    if 'aliens' not in session:
         return jsonify({'error': 'Aliens not designed yet'}), 400
-    return jsonify({'aliens': game_state.alien_designs})
+    return jsonify({'aliens': session['aliens']})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
