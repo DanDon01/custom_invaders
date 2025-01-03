@@ -7,10 +7,24 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentGrid = 0;
     const alienDesigns = [{}, {}, {}, {}];
     let isMouseDown = false;
+    let isRightMouseDown = false;  // Track right mouse button
     
     // Add mouse down/up listeners to document
-    document.addEventListener('mousedown', () => isMouseDown = true);
-    document.addEventListener('mouseup', () => isMouseDown = false);
+    document.addEventListener('mousedown', (e) => {
+        if (e.button === 0) isMouseDown = true;        // Left click
+        if (e.button === 2) isRightMouseDown = true;   // Right click
+    });
+    document.addEventListener('mouseup', (e) => {
+        if (e.button === 0) isMouseDown = false;
+        if (e.button === 2) isRightMouseDown = false;
+    });
+    
+    // Prevent context menu on right click
+    document.addEventListener('contextmenu', (e) => {
+        if (e.target.classList.contains('cell')) {
+            e.preventDefault();
+        }
+    });
     
     // Pre-designed aliens - one for each grid
     const preDesignedAliens = [
@@ -42,6 +56,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     ];
     
+    // Function to update selected grid visual feedback
+    function updateSelectedGridStyle() {
+        document.querySelectorAll('.grid').forEach((grid, index) => {
+            if (index === currentGrid) {
+                grid.classList.add('selected-grid');
+            } else {
+                grid.classList.remove('selected-grid');
+            }
+        });
+    }
+    
     // Create grids with pre-designed options
     for (let g = 0; g < 4; g++) {
         const gridWrapper = document.createElement('div');
@@ -52,25 +77,43 @@ document.addEventListener('DOMContentLoaded', function() {
         grid.className = 'grid';
         grid.dataset.gridId = g;
         
+        // Add click handler to select grid
+        grid.addEventListener('click', function() {
+            currentGrid = parseInt(this.dataset.gridId);
+            updateSelectedGridStyle();
+        });
+        
         for (let i = 0; i < 64; i++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
             cell.dataset.index = i;
             
-            const fillCell = function() {
+            const fillCell = function(erase = false) {
                 const gridId = parseInt(this.parentElement.dataset.gridId);
                 const index = parseInt(this.dataset.index);
-                const color = colorPicker.value;
                 
-                this.style.backgroundColor = color;
-                alienDesigns[gridId][index] = color;
+                if (erase) {
+                    // Erase the cell (set to black)
+                    this.style.backgroundColor = '#000';
+                    delete alienDesigns[gridId][index];
+                } else {
+                    // Fill with selected color
+                    const color = colorPicker.value;
+                    this.style.backgroundColor = color;
+                    alienDesigns[gridId][index] = color;
+                }
             };
             
-            cell.addEventListener('mousedown', fillCell);
+            // Handle left click/drag
+            cell.addEventListener('mousedown', function(e) {
+                if (e.button === 0) fillCell.call(this, false);
+                if (e.button === 2) fillCell.call(this, true);
+            });
+            
+            // Handle mouse movement
             cell.addEventListener('mouseenter', function() {
-                if (isMouseDown) {
-                    fillCell.call(this);
-                }
+                if (isMouseDown) fillCell.call(this, false);
+                if (isRightMouseDown) fillCell.call(this, true);
             });
             
             grid.appendChild(cell);
@@ -97,6 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
         gridWrapper.appendChild(preDesigned);
         gridContainer.appendChild(gridWrapper);
     }
+    
+    // Initialize the first grid as selected
+    updateSelectedGridStyle();
     
     function updateGrid(gridId) {
         const gridElement = document.querySelector(`.grid[data-grid-id="${gridId}"]`);

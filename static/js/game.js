@@ -842,7 +842,7 @@ class Game {
     updateVictoryAnimation() {
         if (!this.victoryAnimation.active) {
             this.victoryAnimation.active = true;
-            this.victoryAnimation.speed = 2;
+            this.victoryAnimation.speed = 1;
         }
 
         // Accelerate ship upward
