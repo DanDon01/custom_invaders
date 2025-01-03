@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Custom Invaders - Alien Designer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/designer.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Design Your Aliens</h1>
+        <div class="designer-container">
+            <div id="grid-container">
+                <!-- 4 grids will be generated here -->
+            </div>
+            <div class="controls">
+                <div class="color-picker">
+                    <input type="color" id="colorPicker" value="#00ff00">
+                </div>
+                <button id="clear-btn">Clear Current Grid</button>
+                <button id="save-aliens">Save Aliens & Start Game</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/designer.js') }}"></script>
+</body>
+</html> 
