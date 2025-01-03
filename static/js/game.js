@@ -17,6 +17,7 @@ class Game {
         // Bullet properties
         this.bullets = [];
         this.bulletSpeed = 7;
+        this.maxBullets = 2;  // Maximum bullets allowed on screen
         
         // Alien properties
         this.aliens = [];
@@ -30,6 +31,7 @@ class Game {
         this.score = 0;
         this.lives = 3;
         this.gameOver = false;
+        this.victory = false;  // New victory state
         
         // Controls
         this.keys = {};
@@ -78,16 +80,26 @@ class Game {
     }
     
     shoot() {
-        this.bullets.push({
-            x: this.player.x + this.player.width / 2,
-            y: this.player.y,
-            width: 3,
-            height: 15
-        });
+        // Only shoot if we haven't reached max bullets
+        if (this.bullets.length < this.maxBullets) {
+            this.bullets.push({
+                x: this.player.x + this.player.width / 2,
+                y: this.player.y,
+                width: 3,
+                height: 15
+            });
+        }
     }
     
     update() {
-        if (this.gameOver) return;
+        if (this.gameOver || this.victory) return;
+        
+        // Check for victory condition
+        const remainingAliens = this.aliens.filter(alien => alien.alive).length;
+        if (remainingAliens === 0) {
+            this.victory = true;
+            return;
+        }
         
         // Player movement
         if (this.keys['ArrowLeft']) {
@@ -155,16 +167,44 @@ class Game {
                rect1.y + rect1.height > rect2.y;
     }
     
+    drawPlayer() {
+        // Draw the ship body
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width / 2, this.player.y); // Top point
+        this.ctx.lineTo(this.player.x + this.player.width, this.player.y + this.player.height); // Bottom right
+        this.ctx.lineTo(this.player.x, this.player.y + this.player.height); // Bottom left
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Draw cockpit
+        this.ctx.fillStyle = '#80ff80';
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width / 2, this.player.y + 10);
+        this.ctx.lineTo(this.player.x + this.player.width / 2 + 8, this.player.y + 20);
+        this.ctx.lineTo(this.player.x + this.player.width / 2 - 8, this.player.y + 20);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Draw engine glow
+        this.ctx.fillStyle = '#ff4400';
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.player.x + this.player.width / 2 - 10, this.player.y + this.player.height);
+        this.ctx.lineTo(this.player.x + this.player.width / 2 + 10, this.player.y + this.player.height);
+        this.ctx.lineTo(this.player.x + this.player.width / 2, this.player.y + this.player.height + 5);
+        this.ctx.closePath();
+        this.ctx.fill();
+    }
+    
     draw() {
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, this.width, this.height);
         
-        // Draw player
-        this.ctx.fillStyle = 'lime';
-        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        // Draw player using new method
+        this.drawPlayer();
         
         // Draw bullets
-        this.ctx.fillStyle = 'white';
+        this.ctx.fillStyle = '#ff9933';
         this.bullets.forEach(bullet => {
             this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
         });
@@ -182,10 +222,17 @@ class Game {
         this.ctx.fillText(`Score: ${this.score}`, 10, 30);
         this.ctx.fillText(`Lives: ${this.lives}`, this.width - 100, 30);
         
+        // Draw game over or victory message
         if (this.gameOver) {
             this.ctx.fillStyle = 'red';
             this.ctx.font = '48px Arial';
             this.ctx.fillText('GAME OVER', this.width/2 - 120, this.height/2);
+        } else if (this.victory) {
+            this.ctx.fillStyle = '#00ff00';
+            this.ctx.font = '48px Arial';
+            this.ctx.fillText('VICTORY!', this.width/2 - 100, this.height/2);
+            this.ctx.font = '24px Arial';
+            this.ctx.fillText(`Final Score: ${this.score}`, this.width/2 - 70, this.height/2 + 50);
         }
     }
     
