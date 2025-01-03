@@ -263,4 +263,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make loadAlienSet function globally accessible
     window.loadAlienSet = loadAlienSet;
+    
+    // Add touch event handlers for mobile
+    function handleTouch(e) {
+        e.preventDefault(); // Prevent scrolling
+        const touch = e.touches[0];
+        const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (cell && cell.classList.contains('cell')) {
+            fillCell.call(cell, false);
+        }
+    }
+
+    // Add these touch event listeners to each grid
+    for (let g = 0; g < 4; g++) {
+        const gridWrapper = document.createElement('div');
+        gridWrapper.className = 'grid-wrapper';
+        
+        const grid = document.createElement('div');
+        grid.className = 'grid';
+        grid.dataset.gridId = g;
+
+        // Add touch event listeners
+        grid.addEventListener('touchstart', handleTouch, { passive: false });
+        grid.addEventListener('touchmove', handleTouch, { passive: false });
+        
+        // ... rest of the grid creation code ...
+    }
+
+    // Add this to prevent default touch behavior on the entire grid container
+    gridContainer.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+    gridContainer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 }); 
