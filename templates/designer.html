@@ -14,6 +14,8 @@
         }
 
         .container {
+            position: relative;
+            z-index: 1;
             max-width: 800px;
             margin: 0 auto;
             padding: 30px;
@@ -296,31 +298,92 @@
                 height: 6px;
             }
         }
+
+        /* Add these new styles for the marquee frame */
+        .marquee-container {
+            position: relative;
+            padding: 4px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            margin: 20px;
+        }
+
+        .marquee-border {
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .marquee-border::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                #00ff00 72deg,
+                #00aa00 144deg,
+                #008800 216deg,
+                #004400 288deg,
+                transparent 360deg
+            );
+            animation: rotate 4s linear infinite;
+        }
+
+        .marquee-border::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: #1a1a1a;
+            border-radius: 16px;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .marquee-container {
+                margin: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Design Your Aliens</h1>
-        <div class="designer-container">
-            <div id="grid-container">
-                <!-- 4 grids will be generated here -->
-            </div>
-            <div class="controls">
-                <div class="color-picker-container">
-                    <div class="color-picker-label">Current Colour</div>
-                    <div class="color-picker">
-                        <div class="click-hint">Click to change color!</div>
-                        <input type="color" id="colorPicker" value="#00ff00">
-                    </div>
+    <div class="marquee-container">
+        <div class="marquee-border"></div>
+        <div class="container">
+            <h1>Design Your Aliens</h1>
+            <div class="designer-container">
+                <div id="grid-container">
+                    <!-- 4 grids will be generated here -->
                 </div>
-                <button id="clear-btn">Clear Current Grid</button>
-                <button id="save-aliens">Save Aliens & Start Game</button>
+                <div class="controls">
+                    <div class="color-picker-container">
+                        <div class="color-picker-label">Current Colour</div>
+                        <div class="color-picker">
+                            <div class="click-hint">Click to change color!</div>
+                            <input type="color" id="colorPicker" value="#00ff00">
+                        </div>
+                    </div>
+                    <button id="clear-btn">Clear Current Grid</button>
+                    <button id="save-aliens">Save Aliens & Start Game</button>
+                </div>
             </div>
-        </div>
-        <div class="pre-designed-container">
-            <h2>Pre-Designed Aliens</h2>
-            <div id="pre-designed-aliens">
-                <!-- Pre-designed aliens will be generated here -->
+            <div class="pre-designed-container">
+                <h2>Pre-Designed Aliens</h2>
+                <div id="pre-designed-aliens">
+                    <!-- Pre-designed aliens will be generated here -->
+                </div>
             </div>
         </div>
     </div>
