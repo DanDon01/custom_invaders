@@ -17,6 +17,13 @@
     margin-bottom: 20px;
 }
 
+.grid-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
@@ -45,18 +52,29 @@
     text-align: center;
 }
 
+.pre-designed-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .pre-designed-alien {
-    display: inline-block;
-    margin: 10px;
-    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1px;
     background: #222;
+    padding: 3px;
     border-radius: 4px;
     cursor: pointer;
+    width: 80px;
+}
+
+.pre-designed-alien:hover {
+    background: #444;
 }
 
 .pre-designed-alien .cell {
-    width: 10px;
-    height: 10px;
-    display: inline-block;
-    margin: 1px;
+    width: 8px;
+    height: 8px;
+    border: none;
 } 
