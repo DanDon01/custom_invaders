@@ -390,6 +390,60 @@
                 font-size: 16px;
             }
         }
+
+        .alien-sets {
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .sets-title {
+            color: #00ff00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        .set-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .set-button {
+            background: #2c3e50;
+            color: #fff;
+            padding: 12px 24px;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .set-button:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .set-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .set-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .set-button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -413,6 +467,14 @@
                         <div class="color-picker">
                             <div class="click-hint">Click to change color!</div>
                             <input type="color" id="colorPicker" value="#00ff00">
+                        </div>
+                    </div>
+                    <div class="alien-sets">
+                        <h3 class="sets-title">Choose Preset Aliens</h3>
+                        <div class="set-buttons">
+                            <button class="set-button" onclick="loadAlienSet('classic')">Classic Set</button>
+                            <button class="set-button" onclick="loadAlienSet('simpsons')">Simpsons Set</button>
+                            <button class="set-button" onclick="loadAlienSet('retro')">Retro Set</button>
                         </div>
                     </div>
                     <button id="clear-btn">Clear Current Grid</button>
